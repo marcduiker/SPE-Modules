@@ -1,0 +1,65 @@
+﻿---
+ID: "48a5fafe-0e17-487b-8774-8bde838a00d7"
+Parent: "ee6b3ad1-e90d-400d-811a-a1bc4036d987"
+Template: "dd22f1b3-bd87-4db2-9e7d-f7a496888d43"
+Path: /sitecore/system/Modules/PowerShell/Script Library/Workflow Management/Internal/List View/Ribbon/Item/Update workflow for all items
+DB: master
+SharedFields:
+- ID: "06d5295c-ed2f-4a54-9bf2-26228d113318"
+  Hint: __Icon
+  Value: "http://sc81rev160302/temp/iconcache/network/32x32/outbox.png"
+- ID: "1c76313e-3c8c-4807-a826-135d10c39299"
+  Hint: ShowRule
+  Type: Rules
+  Value: |
+    <ruleset>
+      <rule
+        uid="{DECDB180-D804-42A8-B458-74E6D63BC05F}">
+        <conditions>
+          <condition
+            id="{1B499603-87C9-4440-969F-D9568CE1E926}"
+            uid="CD0D45D101E94FFF8C2508250D6B6985"
+            ValidViewName="ContentItemsWithMissingWorkflow" />
+        </conditions>
+      </rule>
+    </ruleset>
+- ID: "b1a94ff0-6897-47c0-9c51-aa6acb80b1f0"
+  Hint: Script
+  Value: |
+    $processedItems = New-Object System.Collections.ArrayList
+    
+    function SetWorkFlowAndState {
+        [CmdletBinding()]
+        Param(
+            [Parameter(Mandatory=$true)]
+            [Sitecore.Data.Items.Item]$Item,
+            [Parameter(Mandatory=$true)]
+            [Sitecore.Data.ID]$WorkflowID,
+            [Parameter(Mandatory=$true)]
+            [Sitecore.Data.ID]$WorkflowStateID
+        )
+    
+        $Item.__Workflow = $WorkflowID
+        $Item."__Workflow state" = $WorkflowStateID
+        $processedItems.Add($item) > $null # ignore output of Add
+    }
+    
+    foreach ($item in $allData) {
+        SetWorkFlowAndState $item $actionData.WorkflowID $actionData.WorkflowStateID
+    }
+    
+    if($scriptsession.Output.HasErrors) {
+        Show-Result -Text
+    }
+    
+    $processedItems | Update-ListView
+    
+    Show-Alert -Title "Processed $($processedItems.Count) items." 
+Languages:
+- Language: en
+  Versions:
+  - Version: 1
+    Fields:
+    - ID: "25bed78c-4957-4165-998a-ca1b52f67497"
+      Hint: __Created
+      Value: 20160506T115951Z
