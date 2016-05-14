@@ -36,7 +36,52 @@ SharedFields:
     
     #>
     
-    function GetTemplatesWhichUseTheWorkflow {
+    function Select-WorkflowState {
+        $workflowStateItemResult = Read-Variable -Parameters `
+            @{ Name="Info"; Title="Information"; Value="<p>This script will create a report with content items that have no workflow and workflow state values while their templates have the Default workflow set.</p>
+            <br/>
+            <p>First you select the workflow state which you eventually want set on the content items. Based on this state the script will lookup: </p>
+            <ul>
+                <li>- the workflow,</li>
+                <li>- templates which use the worklow,</li>
+                <li>- content items which are based on these templates.</li>
+            </ul>
+            <br/>
+            <p>The content items will be presented in a report where actions are present to update the workflow and workflow state.</p>"
+            editor="info" },
+            @{ Name = "workflowStateItem"; Title="Select the workflow state"; Root="/sitecore/system/Workflows" } `
+            -Description "" `
+            -Title $windowTitle `
+            -Width 600 `
+            -Height 200 `
+            -OkButtonName "Proceed" `
+            -CancelButtonName "Abort" `
+            -ShowHints
+        if($workflowStateItemResult -ne "ok") 
+        {
+            Exit
+        }
+        
+        return $workflowStateItem
+    }
+    
+    function Get-WorkflowFromWorkflowState {
+        [CmdletBinding()]
+        Param(
+            [Parameter(Mandatory=$true)]
+            [Sitecore.Data.Items.Item]$WorkflowState
+        )
+        
+        $parentItem = $workflowStateItem.Parent
+        if ($parentItem.TemplateID -eq $workflowTemplateID)
+        {
+            return $parentItem
+        }
+        
+        Show-Alert -Title "Parent item of workflow state $($workflowStateItem.Name) is not based on the Workflow template $($workflowTemplateID)." -ErrorAction Stop
+    }
+    
+    function Get-TemplatesWhichUseTheWorkflow {
         [CmdletBinding()]
         Param(
             [Parameter(Mandatory=$true)]
@@ -55,13 +100,13 @@ SharedFields:
         }
     }
     
-    function GetContentItems()
+    function Get-ContentItems()
     {
         $props = @{
             ActionData = @{ WorkflowID = $workflowItem.ID; WorkflowStateID = $workflowStateItem.ID }
             Title = $windowTitle
             InfoTitle ="List of content items matching the templates that use the workflow: $($workflowItem.Name)."
-            InfoDescription = "Step 3 -  In order to update the workflow and workflow state fields either click the 'Update workflow for all items' action or manually select the items you wish to update and click the 'Update Workflow for selected items' action in the ribbon."
+            InfoDescription = "In order to update the workflow and workflow state fields either click the 'Update workflow for all items' action or manually select the items you wish to update and click the 'Update Workflow for selected items' action in the ribbon."
             PageSize = 25
             ViewName = "ContentItemsWithMissingWorkflow"
         }
@@ -78,44 +123,25 @@ SharedFields:
     }
     
     $windowTitle = "Update Workflow and Workflow state on content items"
+    $workflowTemplateID = '{1C0ACC50-37BE-4742-B43C-96A07A7410A5}'
+    $workflowStateTemplateID = '{4B7E2DA9-DE43-4C83-88C3-02F042031D04}'
+    $workflowStateItem = Get-Item master:\system\Workflows
     
-    # Select the workflow
-    $workflowItem = Get-Item master:\system\Workflows
-    $workflowItemResult = Read-Variable -Parameters `
-        @{ Name = "workflowItem"; Title="Workflow"; Root="/sitecore/system/Workflows" } `
-        -Description "Step 1 - Select the Workflow which is required for the content items." `
-        -Title $windowTitle `
-        -Width 600 `
-        -Height 200 `
-        -OkButtonName "Proceed" `
-        -CancelButtonName "Abort" `
-        -ShowHints
-    if($workflowItemResult -ne "ok")
+    $workflowStateItem = Select-WorkflowState
+    
+    if($workflowStateItem.TemplateID -ne $workflowStateTemplateID)
     {
-        Exit
+        Show-Alert -Title "The item you selected does not appear to be based on the Workflow state template $($workflowStateTemplateID). Please try again and select a workflow state."
+        $workflowStateItem = Select-WorkflowState
     }
     
-    # Select the workflow state
-    $workflowStateItem = $workflowItem
-    $workflowStateItemResult = Read-Variable -Parameters `
-        @{ Name = "workflowStateItem"; Title="Workflow state"; Root=$workflowItem.Paths.Path } `
-        -Description "Step 2 - Select the Workflow state which is required for the content items." `
-        -Title $windowTitle `
-        -Width 600 `
-        -Height 200 `
-        -OkButtonName "Proceed" `
-        -CancelButtonName "Abort" `
-        -ShowHints
-    if($workflowStateItemResult -ne "ok")
-    {
-        Exit
-    }
+    $workflowItem = Get-WorkflowFromWorkflowState $workflowStateItem
     
     # Declare a new ArrayList to add the IDs of the templates which use the workflow.
     # An ArrayList is used instead of the the default PS Array because the latter is immutable and not efficient when working with large arrays.
     $script:templateIDsWithDefaultWorkflow = New-Object System.Collections.ArrayList
     
-    GetTemplatesWhichUseTheWorkflow($workflowItem.ID)
+    Get-TemplatesWhichUseTheWorkflow($workflowItem.ID)
     
     if ($script:templateIDsWithDefaultWorkflow.Count -eq 0)
     {
@@ -123,8 +149,9 @@ SharedFields:
     }
     else
     {
-        GetContentItems
+        Get-ContentItems
     }
+    
     Close-Window
 Languages:
 - Language: en
