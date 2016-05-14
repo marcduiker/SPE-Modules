@@ -1,0 +1,18 @@
+﻿---
+ID: "be0f3605-eedb-4434-8eb3-5f3ebb7d19dc"
+Parent: "dff3be8a-f66f-4a06-95f2-dacc2aaf7997"
+Template: "ab154d3d-1126-4ab4-ac21-8b86e6bd70ea"
+Path: /sitecore/system/Modules/PowerShell/Script Library/Workflow Management/Toolbox/Workflow Management
+DB: master
+SharedFields:
+- ID: "06d5295c-ed2f-4a54-9bf2-26228d113318"
+  Hint: __Icon
+  Value: "http://sc81rev160302/temp/iconcache/network/32x32/outbox.png"
+Languages:
+- Language: en
+  Versions:
+  - Version: 1
+    Fields:
+    - ID: "25bed78c-4957-4165-998a-ca1b52f67497"
+      Hint: __Created
+      Value: 20160514T224718Z
