@@ -1,0 +1,55 @@
+<project>
+  <Metadata>
+    <metadata>
+      <PackageName>Workflow Management SPE Module</PackageName>
+      <Author>Marc Duiker</Author>
+      <Version>1.0</Version>
+      <Revision />
+      <License />
+      <Comment>This package contains the items for the Workflow Management Module. The module is written using Sitecore PowerShell Extensions v4 (and requires SPE to be installed) and is tested with Sitecore 8.</Comment>
+      <Attributes />
+      <Readme />
+      <Publisher />
+      <PostStep />
+      <PackageID />
+    </metadata>
+  </Metadata>
+  <SaveProject>True</SaveProject>
+  <Sources>
+    <xitems>
+      <Entries>
+        <x-item>/master/sitecore/system/Modules/PowerShell/Script Library/Workflow Management/{6BECC219-B7E9-4B85-A120-47FF06F64FCD}/invariant/0</x-item>
+        <x-item>/master/sitecore/system/Modules/PowerShell/Script Library/Workflow Management/Functions/{4850B8A1-F3CE-46CB-BECF-D3F79842304F}/invariant/0</x-item>
+        <x-item>/master/sitecore/system/Modules/PowerShell/Script Library/Workflow Management/Functions/Get-TemplatesWhichUseWorkflow/{176CC0D8-4C44-49A8-8B69-A777ED689C79}/invariant/0</x-item>
+        <x-item>/master/sitecore/system/Modules/PowerShell/Script Library/Workflow Management/Functions/Get-WorkflowFromWorkflowState/{4440503F-FAB9-4031-9932-B562B24B427A}/invariant/0</x-item>
+        <x-item>/master/sitecore/system/Modules/PowerShell/Script Library/Workflow Management/Functions/Select-WorkflowState/{0514F160-46BB-429C-B5CF-A1DFB74E5898}/invariant/0</x-item>
+        <x-item>/master/sitecore/system/Modules/PowerShell/Script Library/Workflow Management/Internal/{8AC58A46-94F1-4088-A217-DD09D5A04E98}/invariant/0</x-item>
+        <x-item>/master/sitecore/system/Modules/PowerShell/Script Library/Workflow Management/Internal/List View/{ADEB9331-6EE7-4D85-9ADF-539BBAE6A79B}/invariant/0</x-item>
+        <x-item>/master/sitecore/system/Modules/PowerShell/Script Library/Workflow Management/Internal/List View/Ribbon/{1A119C9E-9082-4EB2-A52E-714F85CEC49B}/invariant/0</x-item>
+        <x-item>/master/sitecore/system/Modules/PowerShell/Script Library/Workflow Management/Internal/List View/Ribbon/Item/{EE6B3AD1-E90D-400D-811A-A1BC4036D987}/invariant/0</x-item>
+        <x-item>/master/sitecore/system/Modules/PowerShell/Script Library/Workflow Management/Internal/List View/Ribbon/Item/Update workflow for all items/{48A5FAFE-0E17-487B-8774-8BDE838A00D7}/invariant/0</x-item>
+        <x-item>/master/sitecore/system/Modules/PowerShell/Script Library/Workflow Management/Internal/List View/Ribbon/Item/Update workflow for selected items/{E81B6D82-68B8-4544-97B5-2892744D0C38}/invariant/0</x-item>
+        <x-item>/master/sitecore/system/Modules/PowerShell/Script Library/Workflow Management/Toolbox/{DFF3BE8A-F66F-4A06-95F2-DACC2AAF7997}/invariant/0</x-item>
+        <x-item>/master/sitecore/system/Modules/PowerShell/Script Library/Workflow Management/Toolbox/Workflow Management/{BE0F3605-EEDB-4434-8EB3-5F3EBB7D19DC}/invariant/0</x-item>
+        <x-item>/master/sitecore/system/Modules/PowerShell/Script Library/Workflow Management/Toolbox/Workflow Management/Update workflow and state for content items/{D32DEF58-2C7C-46FE-B156-121A89F51BA0}/invariant/0</x-item>
+      </Entries>
+      <SkipVersions>False</SkipVersions>
+      <Converter>
+        <ItemToEntryConverter>
+          <Transforms />
+        </ItemToEntryConverter>
+      </Converter>
+      <Include />
+      <Exclude />
+      <Name>system</Name>
+    </xitems>
+  </Sources>
+  <Converter>
+    <TrivialConverter>
+      <Transforms />
+    </TrivialConverter>
+  </Converter>
+  <Include />
+  <Exclude />
+  <Name />
+</project>
