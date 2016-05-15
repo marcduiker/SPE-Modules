@@ -27,25 +27,30 @@ SharedFields:
   Hint: Script
   Value: |
     $processedItems = New-Object System.Collections.ArrayList
+    $itemCount = 0
     
-    function SetWorkFlowAndState {
+    function Set-WorkFlowAndState {
         [CmdletBinding()]
         Param(
             [Parameter(Mandatory=$true)]
             [Sitecore.Data.Items.Item]$Item,
             [Parameter(Mandatory=$true)]
-            [Sitecore.Data.ID]$WorkflowID,
+            [Sitecore.Data.Items.Item]$WorkflowItem,
             [Parameter(Mandatory=$true)]
-            [Sitecore.Data.ID]$WorkflowStateID
+            [Sitecore.Data.Items.Item]$WorkflowStateItem
         )
     
-        $Item.__Workflow = $WorkflowID
-        $Item."__Workflow state" = $WorkflowStateID
-        $processedItems.Add($item) > $null # ignore output of Add
+        if ($selectedData.Contains($Item)) {
+            $Item.__Workflow = $WorkflowItem.ID
+            $Item."__Workflow state" = $WorkflowStateItem.ID
+            $script:itemCount++
+        }
+        
+        $processedItems.Add($Item) > $null # ignore output of Add
     }
     
-    foreach ($item in $selectedData) {
-        SetWorkFlowAndState $item $actionData.WorkflowID $actionData.WorkflowStateID
+    foreach ($item in $allData) {
+        Set-WorkFlowAndState -Item $item -WorkflowItem $actionData.WorkflowItem -WorkflowStateItem $actionData.WorkflowStateItem
     }
     
     if($scriptsession.Output.HasErrors) {
@@ -54,7 +59,7 @@ SharedFields:
     
     $processedItems | Update-ListView
     
-    Show-Alert -Title "Processed $($processedItems.Count) items." 
+    Show-Alert -Title "Processed $($itemCount) items." 
 Languages:
 - Language: en
   Versions:

@@ -50,7 +50,7 @@ SharedFields:
             [Sitecore.Data.Items.Item]$WorkflowStateItem
         )
         $props = @{
-            ActionData = @{ WorkflowID = $WorkflowItem.ID; WorkflowStateID = $WorkflowStateItem.ID }
+            ActionData = @{ WorkflowItem = $WorkflowItem; WorkflowStateItem = $WorkflowStateItem }
             Title = $windowTitle
             InfoTitle ="List of content items matching the templates that use the workflow: $($WorkflowItem.Name)."
             InfoDescription = "In order to update the workflow and workflow state fields either click the 'Update workflow for all items' action or manually select the items you wish to update and click the 'Update Workflow for selected items' action in the ribbon."

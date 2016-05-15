@@ -28,24 +28,24 @@ SharedFields:
   Value: |
     $processedItems = New-Object System.Collections.ArrayList
     
-    function SetWorkFlowAndState {
+    function Set-WorkFlowAndState {
         [CmdletBinding()]
         Param(
             [Parameter(Mandatory=$true)]
             [Sitecore.Data.Items.Item]$Item,
             [Parameter(Mandatory=$true)]
-            [Sitecore.Data.ID]$WorkflowID,
+            [Sitecore.Data.Items.Item]$WorkflowItem,
             [Parameter(Mandatory=$true)]
-            [Sitecore.Data.ID]$WorkflowStateID
+            [Sitecore.Data.Items.Item]$WorkflowStateItem
         )
     
-        $Item.__Workflow = $WorkflowID
-        $Item."__Workflow state" = $WorkflowStateID
-        $processedItems.Add($item) > $null # ignore output of Add
+        $Item.__Workflow = $WorkflowItem.ID
+        $Item."__Workflow state" = $WorkflowStateItem.ID
+        $processedItems.Add($Item) > $null # ignore output of Add
     }
     
     foreach ($item in $allData) {
-        SetWorkFlowAndState $item $actionData.WorkflowID $actionData.WorkflowStateID
+        Set-WorkFlowAndState -Item $item -WorkflowItem $actionData.WorkflowItem -WorkflowStateItem $actionData.WorkflowStateItem
     }
     
     if($scriptsession.Output.HasErrors) {
