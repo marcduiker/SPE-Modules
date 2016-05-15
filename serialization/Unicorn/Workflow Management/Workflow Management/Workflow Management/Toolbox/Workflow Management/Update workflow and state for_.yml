@@ -1,0 +1,100 @@
+﻿---
+ID: "d32def58-2c7c-46fe-b156-121a89f51ba0"
+Parent: "be0f3605-eedb-4434-8eb3-5f3ebb7d19dc"
+Template: "dd22f1b3-bd87-4db2-9e7d-f7a496888d43"
+Path: /sitecore/system/Modules/PowerShell/Script Library/Workflow Management/Toolbox/Workflow Management/Update workflow and state for content items
+DB: master
+SharedFields:
+- ID: "06d5295c-ed2f-4a54-9bf2-26228d113318"
+  Hint: __Icon
+  Value: Network/32x32/outbox.png
+- ID: "b1a94ff0-6897-47c0-9c51-aa6acb80b1f0"
+  Hint: Script
+  Value: |
+    <#
+    
+    .SYNOPSIS
+    
+        Update Workflow and Workflow state of content items which have no workflow set while their templates have the Default workflow field set.
+    
+    .DESCRIPTION
+    
+        This script can be used when existing content is not assigned to a workflow and workflow state while it should be. 
+        This scenario usually occurs when a workflow is assigned to a template but there is already content created based on a previous version of that template (where the workflow was not yet assigned). 
+        
+        The script will first search for the templates that use the selected Workflow in the Default workflow field in Standard Values items. 
+        This means that the templates which use the workflow must exist on the environment where you are going to run this script.
+        
+        The script will retrieve content items which match those templates and have no workflow assigned to them (so it won't overwrite existing workflows/states).
+        The items will be shown in a report where two actions will be available:
+        -   Update workflow for all items
+        -   Update workflow for selected items
+    
+    .NOTES
+    
+        Written by Marc Duiker (https://twitter.com/marcduiker), May 2016
+    
+    #>
+    
+    Import-Function Select-WorkflowState
+    Import-Function Get-WorkflowFromWorkflowState
+    Import-Function Get-TemplatesWhichUseWorkflow
+    
+    function Create-ViewWithContentItems {
+        Param(
+            [Parameter(Mandatory=$true)]
+            [System.Collections.ArrayList]$TemplateIDsWithDefaultWorkflow,
+            [Parameter(Mandatory=$true)]
+            [Sitecore.Data.Items.Item]$WorkflowItem,
+            [Parameter(Mandatory=$true)]
+            [Sitecore.Data.Items.Item]$WorkflowStateItem
+        )
+        $props = @{
+            ActionData = @{ WorkflowItem = $WorkflowItem; WorkflowStateItem = $WorkflowStateItem }
+            Title = $windowTitle
+            InfoTitle ="List of content items matching the templates that use the workflow: $($WorkflowItem.Name)."
+            InfoDescription = "In order to update the workflow and workflow state fields either click the 'Update workflow for all items' action or manually select the items you wish to update and click the 'Update Workflow for selected items' action in the ribbon."
+            PageSize = 25
+            ViewName = "ContentItemsWithMissingWorkflow"
+        }
+        
+        # Get only the content items for the matching templateIDs and where the Workflow field is empty (to make sure we don't overwrite existing workflows/states).
+        Get-ChildItem -Path master:/content `
+            -Recurse | `
+            Where-Object { ($TemplateIDsWithDefaultWorkflow.Contains($_.TemplateID)) -and ($_.__Workflow -eq "") } | `
+            Show-ListView @props `
+            -Property @{ Label="Display Name"; Expression={ $_.DisplayName } }, 
+                    @{ Label="Template"; Expression={ $_.TemplateName } },
+                    @{ Label="Workflow ID"; Expression={ $_.__Workflow } },
+                    @{ Label="Workflow state ID"; Expression={ $_."__Workflow state" } }
+    }
+    
+    $windowTitle = "Update Workflow and Workflow state on content items"
+    $workflowTemplateID = '{1C0ACC50-37BE-4742-B43C-96A07A7410A5}'
+    $workflowStateItem = Get-Item master:\system\Workflows
+    $workflowStateItem = Select-WorkflowState
+    
+    if($workflowStateItem.TemplateID -ne $workflowStateTemplateID) {
+        Show-Alert -Title "The item you selected does not appear to be based on the Workflow state template $($workflowStateTemplateID). Please try again and select a workflow state."
+        $workflowStateItem = Select-WorkflowState
+    }
+    
+    $workflowItem = Get-WorkflowFromWorkflowState $workflowStateItem
+    $templateIDsWithDefaultWorkflow = Get-TemplatesWhichUseWorkflow $workflowItem
+    
+    if ($templateIDsWithDefaultWorkflow.Count -eq 0) {
+        Show-Alert -Title "No templates found which use the workflow. Please make sure the Default workflow field is set on the __Standard Values of the templates that require to use the workflow." -ErrorAction Stop
+    }
+    else {
+        Create-ViewWithContentItems $templateIDsWithDefaultWorkflow $workflowItem $workflowStateItem
+    }
+    
+    Close-Window
+Languages:
+- Language: en
+  Versions:
+  - Version: 1
+    Fields:
+    - ID: "25bed78c-4957-4165-998a-ca1b52f67497"
+      Hint: __Created
+      Value: 20160506T093010Z

@@ -1,0 +1,46 @@
+﻿---
+ID: "0514f160-46bb-429c-b5cf-a1dfb74e5898"
+Parent: "4850b8a1-f3ce-46cb-becf-d3f79842304f"
+Template: "dd22f1b3-bd87-4db2-9e7d-f7a496888d43"
+Path: "/sitecore/system/Modules/PowerShell/Script Library/Workflow Management/Functions/Select-WorkflowState"
+DB: master
+SharedFields:
+- ID: "b1a94ff0-6897-47c0-9c51-aa6acb80b1f0"
+  Hint: Script
+  Value: |
+    function Select-WorkflowState {
+        $workflowStateItemResult = Read-Variable -Parameters `
+            @{ Name="Info"; Title="Information"; Value="<p>This script will create a report with content items that have no workflow and workflow state values while their templates have the Default workflow set.</p>
+            <br/>
+            <p>First you select the workflow state which you eventually want set on the content items. Based on this state the script will lookup: </p>
+            <ul>
+                <li>- the workflow,</li>
+                <li>- templates which use the worklow,</li>
+                <li>- content items which are based on these templates.</li>
+            </ul>
+            <br/>
+            <p>The content items will be presented in a report where actions are present to update the workflow and workflow state.</p>"
+            editor="info" },
+            @{ Name = "workflowStateItem"; Title="Select the workflow state"; Root="/sitecore/system/Workflows" } `
+            -Description "" `
+            -Title $windowTitle `
+            -Width 600 `
+            -Height 200 `
+            -OkButtonName "Proceed" `
+            -CancelButtonName "Abort" `
+            -ShowHints
+        if($workflowStateItemResult -ne "ok") 
+        {
+            Exit
+        }
+        
+        return $workflowStateItem
+    }
+Languages:
+- Language: en
+  Versions:
+  - Version: 1
+    Fields:
+    - ID: "25bed78c-4957-4165-998a-ca1b52f67497"
+      Hint: __Created
+      Value: 20160514T221357Z

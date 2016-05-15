@@ -1,0 +1,44 @@
+﻿---
+ID: "176cc0d8-4c44-49a8-8b69-a777ed689c79"
+Parent: "4850b8a1-f3ce-46cb-becf-d3f79842304f"
+Template: "dd22f1b3-bd87-4db2-9e7d-f7a496888d43"
+Path: "/sitecore/system/Modules/PowerShell/Script Library/Workflow Management/Functions/Get-TemplatesWhichUseWorkflow"
+DB: master
+SharedFields:
+- ID: "b1a94ff0-6897-47c0-9c51-aa6acb80b1f0"
+  Hint: Script
+  Value: |
+    function Get-TemplatesWhichUseWorkflow {
+        [CmdletBinding()]
+        Param(
+            [Parameter(Mandatory=$true)]
+            [Sitecore.Data.Items.Item]$WorkflowItem
+        )
+        
+        # Declare a new ArrayList to add the IDs of the templates which use the workflow.
+        # An ArrayList is used instead of the the default PS Array because the latter is immutable and not efficient when working with large arrays.
+        $templateIDsWithDefaultWorkflow = New-Object System.Collections.ArrayList
+        
+        $itemsWithMatchingDefaultWorkflow = Get-Item -Path master: -Query "/sitecore/templates//*[@__Default workflow='$($WorkflowItem.ID)']"
+        Write-Host  "Templates which use workflow $($WorkflowItem.Name):"
+        
+        foreach ($item in $itemsWithMatchingDefaultWorkflow)
+        {
+            # The Default workflow field can only be set for __Standard Value items but checking that nevertheless.
+            if ($item.Name -eq "__Standard Values")
+            {
+                $templateIDsWithDefaultWorkflow.Add($item.TemplateID) > $null # The output of the Add is ignored
+                Write-Host " -" $item.TemplateName $item.TemplateID
+            }
+        }
+        
+        return $templateIDsWithDefaultWorkflow
+    }
+Languages:
+- Language: en
+  Versions:
+  - Version: 1
+    Fields:
+    - ID: "25bed78c-4957-4165-998a-ca1b52f67497"
+      Hint: __Created
+      Value: 20160514T223557Z

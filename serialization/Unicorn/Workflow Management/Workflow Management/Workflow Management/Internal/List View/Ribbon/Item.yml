@@ -1,0 +1,14 @@
+﻿---
+ID: "ee6b3ad1-e90d-400d-811a-a1bc4036d987"
+Parent: "1a119c9e-9082-4eb2-a52e-714f85cec49b"
+Template: "ab154d3d-1126-4ab4-ac21-8b86e6bd70ea"
+Path: /sitecore/system/Modules/PowerShell/Script Library/Workflow Management/Internal/List View/Ribbon/Item
+DB: master
+Languages:
+- Language: en
+  Versions:
+  - Version: 1
+    Fields:
+    - ID: "25bed78c-4957-4165-998a-ca1b52f67497"
+      Hint: __Created
+      Value: 20160506T115924Z
