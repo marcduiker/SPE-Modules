@@ -4,6 +4,4 @@ Repository with Sitecore PowerShell Modules.
 
 ## Dependencies
 
-- Sitecore 8
-- Sitecore PowerShell Extensions 4
-- Unicorn 3 (to get the scripts under version control)
+The Modules are made with Sitecore PowerShell Extensions 4 running in Sitecore 8.
