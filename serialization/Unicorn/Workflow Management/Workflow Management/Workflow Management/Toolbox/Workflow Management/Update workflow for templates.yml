@@ -1,0 +1,95 @@
+﻿---
+ID: "febc2bcc-a95b-400f-bab9-0c2d31a9c972"
+Parent: "be0f3605-eedb-4434-8eb3-5f3ebb7d19dc"
+Template: "dd22f1b3-bd87-4db2-9e7d-f7a496888d43"
+Path: /sitecore/system/Modules/PowerShell/Script Library/Workflow Management/Toolbox/Workflow Management/Update workflow for templates
+DB: master
+SharedFields:
+- ID: "b1a94ff0-6897-47c0-9c51-aa6acb80b1f0"
+  Hint: Script
+  Value: |
+    <#
+    
+    .SYNOPSIS
+    
+        Update the Default workflow field for several templates at once.
+    
+    .DESCRIPTION
+    
+        This script can be used when you need to assign a workflow to the Default workflow field of several templates. 
+        
+        The script will first show a dialog where the user can select the workflow.
+        Then a dialog is shown where the user can select a template folder. This is the rootfolder where the script will search for templates which will be shown in a list view where the user can set the workflow on those templates.
+        
+        The templates will be shown in a lsit view where two actions will be available:
+        -   Update workflow for all templates
+        -   Update workflow for selected templates
+    
+    .NOTES
+    
+        Written by Marc Duiker (https://twitter.com/marcduiker), May 2016
+    
+    #>
+    
+    Import-Function Select-Workflow
+    Import-Function Get-WorkflowFromWorkflowState
+    Import-Function Get-TemplatesWhichUseWorkflow
+    
+    function Create-ViewWithContentItems {
+        Param(
+            [Parameter(Mandatory=$true)]
+            [System.Collections.ArrayList]$TemplateIDsWithDefaultWorkflow,
+            [Parameter(Mandatory=$true)]
+            [Sitecore.Data.Items.Item]$WorkflowItem,
+            [Parameter(Mandatory=$true)]
+            [Sitecore.Data.Items.Item]$WorkflowStateItem
+        )
+        $props = @{
+            ActionData = @{ WorkflowItem = $WorkflowItem; WorkflowStateItem = $WorkflowStateItem }
+            Title = $windowTitle
+            InfoTitle ="List of content items matching the templates that use the workflow: $($WorkflowItem.Name)."
+            InfoDescription = "In order to update the workflow and workflow state fields either click the 'Update workflow for all items' action or manually select the items you wish to update and click the 'Update Workflow for selected items' action in the ribbon."
+            PageSize = 25
+            ViewName = "ContentItemsWithMissingWorkflow"
+        }
+        
+        # Get only the content items for the matching templateIDs and where the Workflow field is empty (to make sure we don't overwrite existing workflows/states).
+        Get-ChildItem -Path master:/content `
+            -Recurse | `
+            Where-Object { ($TemplateIDsWithDefaultWorkflow.Contains($_.TemplateID)) -and ($_.__Workflow -eq "") } | `
+            Show-ListView @props `
+            -Property @{ Label="Display Name"; Expression={ $_.DisplayName } }, 
+                    @{ Label="Template"; Expression={ $_.TemplateName } },
+                    @{ Label="Workflow ID"; Expression={ $_.__Workflow } },
+                    @{ Label="Workflow state ID"; Expression={ $_."__Workflow state" } }
+    }
+    
+    $windowTitle = "Update Workflow and Workflow state on content items"
+    $workflowTemplateID = '{1C0ACC50-37BE-4742-B43C-96A07A7410A5}'
+    $workflowStateItem = Get-Item master:\system\Workflows
+    $workflowStateItem = Select-WorkflowState
+    
+    if($workflowStateItem.TemplateID -ne $workflowStateTemplateID) {
+        Show-Alert -Title "The item you selected does not appear to be based on the Workflow state template $($workflowStateTemplateID). Please try again and select a workflow state."
+        $workflowStateItem = Select-WorkflowState
+    }
+    
+    $workflowItem = Get-WorkflowFromWorkflowState $workflowStateItem
+    $templateIDsWithDefaultWorkflow = Get-TemplatesWhichUseWorkflow $workflowItem
+    
+    if ($templateIDsWithDefaultWorkflow.Count -eq 0) {
+        Show-Alert -Title "No templates found which use the workflow. Please make sure the Default workflow field is set on the __Standard Values of the templates that require to use the workflow." -ErrorAction Stop
+    }
+    else {
+        Create-ViewWithContentItems $templateIDsWithDefaultWorkflow $workflowItem $workflowStateItem
+    }
+    
+    Close-Window
+Languages:
+- Language: en
+  Versions:
+  - Version: 1
+    Fields:
+    - ID: "25bed78c-4957-4165-998a-ca1b52f67497"
+      Hint: __Created
+      Value: 20160517T192407Z
